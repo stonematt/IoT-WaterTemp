@@ -2,7 +2,7 @@
 import time
 import sys
 from datetime import datetime
-from oneWire import TemperatureSensor
+from oneWire import temperatureSensor
 from oneWire import oneWire
 
 # setup onewire and polling interval
