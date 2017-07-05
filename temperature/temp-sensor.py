@@ -2,8 +2,8 @@
 import time
 import sys
 from datetime import datetime
-from oneWire import temperatureSensor
-from oneWire import oneWire
+from temperatureSensor import TemperatureSensor
+import oneWire
 
 # setup onewire and polling interval
 oneWireGpio = 19 # set the sensor GPIO
