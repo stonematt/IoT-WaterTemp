@@ -1,0 +1,32 @@
+#!/bin/ash
+
+# script needs the 1wire kernel module install prior to running the script
+# hints: (where 19 is the gpio pin of the 1wire)
+# in /etc/rc.local add this:
+# insmod w1-gpio-custom bus0=0,19,0
+
+
+export busRoot="/sys/devices/w1_bus_master1"
+export histDir="/root/data/temperature"
+
+# verify the w1 bus is setup and working
+if [ ! -d "$busRoot" ]; then
+  echo "One Wire not configured in $busRoot"
+  return 0
+fi
+
+# make the history directory if it doesn't exist
+mkdir -p $histDir || exit 1
+
+
+# read the sensors and log the data into a file for history an done for the last reading
+for sensor in `cat $busRoot/w1_master_slaves`
+do
+  export currentTemp=`awk -F= '/t=/ {printf "%.03f\n", $2/1000}' $busRoot/$sensor/w1_slave`
+  #echo "$sensor temp is $currentTemp"
+  echo $currentTemp > $histDir/$sensor.last
+  echo `date -I'seconds'` "," $sensor "," $currentTemp >> $histDir/$sensor.history 
+done
+
+
+#example: awk -F= '/t=/ {printf "%.03f\n", $2/1000}' /sys/devices/w1_bus_master1/28-000123456789/w1_slave

@@ -9,7 +9,6 @@ import oneWire
 oneWireGpio = 19 # set the sensor GPIO
 
 # use command line argument to set the polling interval
-print len(sys.argv)
 if len(sys.argv) == 1:
     pollingInterval = 300 #if no command line argument, use 300s
 else:
