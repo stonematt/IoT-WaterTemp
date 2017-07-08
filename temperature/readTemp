@@ -22,17 +22,21 @@ mkdir -p $histDir || exit 1
 
 
 # read the sensors and log the data into a file for history an done for the last reading
+
+# add a header to the html file
 echo "Date, Sensor, Temperature (C) <br>" > $histDir/temperatures.html
 
+# loop through each sensor, and add the current reading to a few files.
 for sensor in `cat $busRoot/w1_master_slaves`
 do
   export currentTemp=`awk -F= '/t=/ {printf "%.03f\n", $2/1000}' $busRoot/$sensor/w1_slave`
   #echo "$sensor temp is $currentTemp"
-  # echo $sensor $currentTemp > $histDir/$sensor.last
-  echo `date -I'seconds'` "," $sensor "," $currentTemp > $histDir/$sensor.last 
-  echo `date -I'seconds'` "," $sensor "," $currentTemp "<br>">> $histDir/temperatures.html 
-  echo `date -I'seconds'` "," $sensor "," $currentTemp >> $histDir/$sensor.history 
+  echo `date -I'seconds'` "," $sensor "," $currentTemp > $histDir/$sensor.last
+  echo `date -I'seconds'` "," $sensor "," $currentTemp "<br>">> $histDir/temperatures.html
+  echo `date -I'seconds'` "," $sensor "," $currentTemp >> $histDir/$sensor.`date -I`.history
 done
 
+# archive and zip for easy transport - one file per day
+tar -cz -f $histDir/../temp.`date -I`.tgz $histDir
 
 #example: awk -F= '/t=/ {printf "%.03f\n", $2/1000}' /sys/devices/w1_bus_master1/28-000123456789/w1_slave
