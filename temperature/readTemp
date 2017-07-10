@@ -18,7 +18,7 @@ if [ ! -d "$busRoot" ]; then
 fi
 
 # make the history directory if it doesn't exist
-mkdir -p $histDir || exit 1
+mkdir -p $histDir/dailies || exit 1
 
 
 # read the sensors and log the data into a file for history an done for the last reading
@@ -33,10 +33,10 @@ do
   #echo "$sensor temp is $currentTemp"
   echo `date -I'seconds'` "," $sensor "," $currentTemp > $histDir/$sensor.last
   echo `date -I'seconds'` "," $sensor "," $currentTemp "<br>">> $histDir/temperatures.html
-  echo `date -I'seconds'` "," $sensor "," $currentTemp >> $histDir/$sensor.`date -I`.history
+  echo `date -I'seconds'` "," $sensor "," $currentTemp >> $histDir/dailies/waterTemp.`date -I`.history
 done
 
 # archive and zip for easy transport - one file per day
-tar -cz -f $histDir/../temp.`date -I`.tgz $histDir
+tar -cz -f $histDir/../temp.`date -I`.tgz $histDir/dailies/waterTemp.`date -I`.history
 
 #example: awk -F= '/t=/ {printf "%.03f\n", $2/1000}' /sys/devices/w1_bus_master1/28-000123456789/w1_slave
