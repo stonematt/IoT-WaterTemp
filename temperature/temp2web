@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# export fileline=`head -2 ~/tmp/temperature/root/data/temperature/28-0000087feb84.2017-07-11.history`
+# export fileline="2017-07-11T00:00:02-0600 , 28-0000087feb84 , 31.812"
+# echo file is: $fileline
+
+while read -r reading
+do
+  IFS=',' read -a myarray <<< "$reading"
+  export dateStamp="${myarray[0]}"
+  export temperature="${myarray[2]}"
+
+  # goal: {x: moment("2017-07-08T06:15:02-0600"), y: 23.375},
+  echo "{x: moment(\"$dateStamp\"), y: $temperature},"
+
+done <  $1
