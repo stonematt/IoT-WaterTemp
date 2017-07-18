@@ -1,12 +1,16 @@
-#!/bin/ash
+#!/bin/sh
+
+# This script reads the 1wire temperature sensors and writes the results
+# to two files,
+# $sensor.last is the most recent reading
+# $sensor.waterTemp.full.history is the full history for that sensor
+# This script also creates a recent history file of the last 1,000 data points
 
 # run this scrip from cron (every 5m): */5 * * * * /stone-IoT/IoT-WaterTemp/temperature/readTemp
 # script needs the 1wire kernel module install prior to running the script
 # hints: (where 19 is the gpio pin of the 1wire)
 # in /etc/rc.local add this:
 # insmod w1-gpio-custom bus0=0,19,0
-
-
 
 export busRoot="/sys/devices/w1_bus_master1"
 export histDir="/root/data/temperature"
@@ -20,23 +24,27 @@ fi
 # make the history directory if it doesn't exist
 mkdir -p $histDir/dailies || exit 1
 
-
-# read the sensors and log the data into a file for history an done for the last reading
-
-# add a header to the html file
-echo "Date, Sensor, Temperature (C) <br>" > $histDir/temperatures.html
-
 # loop through each sensor, and add the current reading to a few files.
 for sensor in `cat $busRoot/w1_master_slaves`
 do
+  # take a temp reading from the sensor
   export currentTemp=`awk -F= '/t=/ {printf "%.03f\n", $2/1000}' $busRoot/$sensor/w1_slave`
-  #echo "$sensor temp is $currentTemp"
-  echo `date -I'seconds'` "," $sensor "," $currentTemp > $histDir/$sensor.last
-  echo `date -I'seconds'` "," $sensor "," $currentTemp "<br>">> $histDir/temperatures.html
-  echo `date -I'seconds'` "," $sensor "," $currentTemp >> $histDir/dailies/waterTemp.`date -I`.history
+  export currentDate=`date -I'seconds'`
+  export sensorReading = "$currentDate,$sensor,$currentTemp"
+  echo $sensorReading > $histDir/$sensor.last
+  echo $sensorReading >> $histDir/$sensor.waterTemp.full.history
+  # echo `date -I'seconds'`","$sensor","$currentTemp > $histDir/$sensor.last
+  # echo `date -I'seconds'`","$sensor","$currentTemp >> $histDir/$sensor.waterTemp.full.history
+
+  # save the datapoint for chart.js
+  export chartjsDatapoint="{x: moment(\"$currentDate\"), y: $currentTemp},"
+  echo $chartjsDatapoint >> $histDir/$sensor.dataset.js
+  # keep a moving window of 1000 data points for a recent chart
+  `tail -1000 $histDir/$sensor.dataset.js > $histDir/$sensor.recent.dataset.js `
 done
 
 # archive and zip for easy transport - one file per day
-tar -cz -f $histDir/../temp.`date -I`.tgz $histDir/dailies/waterTemp.`date -I`.history
+tar -cz -f $histDir/../temp.`date -I`.tgz $histDir/*.waterTemp.*.history
+
 
 #example: awk -F= '/t=/ {printf "%.03f\n", $2/1000}' /sys/devices/w1_bus_master1/28-000123456789/w1_slave
