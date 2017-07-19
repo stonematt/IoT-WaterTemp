@@ -1,0 +1,13 @@
+#!/bin/sh
+
+export dataDir="/root/data/temperature"
+export webDir="/stone-IoT/IoT-WaterTemp/www"
+export sensorDataSet1="$dataDir/28-0000087f3550.recent.dataset.js"
+export sensorDataSet2="$dataDir/28-0000087feb84.recent.dataset.js"
+export sensorDataSet3="$dataDir/28-0416b3c4e3ff.recent.dataset.js"
+
+
+cat templates/htmlTop.html $sensorDataSet1 \
+  templates/htmlMid1.html $sensorDataSet2 \
+  templates/htmlMid2.html $sensorDataSet3 \
+  templates/htmlBottom.html > $webDir/index.html

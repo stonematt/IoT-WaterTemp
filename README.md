@@ -11,3 +11,5 @@ insmod w1-gpio-custom bus0=0,19,0
 
 list devices:
 cat /sys/devices/w1_bus_master1/w1_master_slaves
+
+also ln -s www directory into web server somewhere

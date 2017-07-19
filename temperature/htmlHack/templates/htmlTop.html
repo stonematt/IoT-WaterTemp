@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+	
+</head>
+
+<body>
+  <script src="js/moment.js"></script>
+  <script src="js/Chart.min.js"></script>
+
+
+<h1>Recent Water Temperature History</h1>
+
+  <div class="chart-container" style="height:40vh; width:80vw">
+      <canvas id="popChart"></canvas>
+  </div>
+
+<!--TODO: need to move this to a real file... -->
+<script>
+  var popCanvas = document.getElementById("popChart");
+  Chart.defaults.global.defaultFontFamily = "Verdana";
+  Chart.defaults.global.defaultFontSize = 22;
+  Chart.defaults.global.defaultFontColor = 'blue';
+
+
+// make line style
+
+// make the data
+  // TODO: - read from files in data direcotry to populate dataset
+var dataFirst = {
+  label: "28-0000087f3550 (lower)",
+  data: [
+    

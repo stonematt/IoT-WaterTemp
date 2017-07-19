@@ -13,8 +13,7 @@
 # insmod w1-gpio-custom bus0=0,19,0
 
 export busRoot="/sys/devices/w1_bus_master1"
-# export histDir="/root/data/temperature"
-export histDir="~/tmp/data/temperature"
+export histDir="/root/data/temperature"
 
 # verify the w1 bus is setup and working
 if [ ! -d "$busRoot" ]; then
@@ -44,6 +43,14 @@ done
 
 # archive and zip for easy transport - one file per day
 tar -cz -f $histDir/../temp.`date -I`.tgz $histDir/
+
+# run the HTML hack...  ick
+# Absolute path to this script. /home/user/bin/foo.sh
+SCRIPT=$(readlink -f $0)
+# Absolute path this script is in. /home/user/bin
+SCRIPTPATH=`dirname $SCRIPT`
+cd $SCRIPTPATH/htmlHack && ./makeHtml 
+
 
 
 #example: awk -F= '/t=/ {printf "%.03f\n", $2/1000}' /sys/devices/w1_bus_master1/28-000123456789/w1_slave
