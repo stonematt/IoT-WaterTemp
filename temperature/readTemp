@@ -30,7 +30,7 @@ do
   # take a temp reading from the sensor
   export currentTemp=`awk -F= '/t=/ {printf "%.03f\n", $2/1000}' $busRoot/$sensor/w1_slave`
   export currentDate=`date -I'seconds'`
-  export sensorReading = "$currentDate,$sensor,$currentTemp"
+  export sensorReading="$currentDate,$sensor,$currentTemp"
   echo $sensorReading > $histDir/$sensor.last
   echo $sensorReading >> $histDir/$sensor.waterTemp.full.history
   # echo `date -I'seconds'`","$sensor","$currentTemp > $histDir/$sensor.last
