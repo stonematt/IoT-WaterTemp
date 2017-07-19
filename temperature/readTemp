@@ -13,7 +13,8 @@
 # insmod w1-gpio-custom bus0=0,19,0
 
 export busRoot="/sys/devices/w1_bus_master1"
-export histDir="/root/data/temperature"
+# export histDir="/root/data/temperature"
+export histDir="~/tmp/data/temperature"
 
 # verify the w1 bus is setup and working
 if [ ! -d "$busRoot" ]; then
@@ -22,7 +23,7 @@ if [ ! -d "$busRoot" ]; then
 fi
 
 # make the history directory if it doesn't exist
-mkdir -p $histDir/dailies || exit 1
+mkdir -p $histDir/backup || exit 1
 
 # loop through each sensor, and add the current reading to a few files.
 for sensor in `cat $busRoot/w1_master_slaves`
@@ -32,9 +33,7 @@ do
   export currentDate=`date -I'seconds'`
   export sensorReading="$currentDate,$sensor,$currentTemp"
   echo $sensorReading > $histDir/$sensor.last
-  echo $sensorReading >> $histDir/$sensor.waterTemp.full.history
-  # echo `date -I'seconds'`","$sensor","$currentTemp > $histDir/$sensor.last
-  # echo `date -I'seconds'`","$sensor","$currentTemp >> $histDir/$sensor.waterTemp.full.history
+  echo $sensorReading >> $histDir/backup/$sensor.waterTemp.full.history
 
   # save the datapoint for chart.js
   export chartjsDatapoint="{x: moment(\"$currentDate\"), y: $currentTemp},"
@@ -44,7 +43,7 @@ do
 done
 
 # archive and zip for easy transport - one file per day
-tar -cz -f $histDir/../temp.`date -I`.tgz $histDir/*.waterTemp.*.history
+tar -cz -f $histDir/../temp.`date -I`.tgz $histDir/
 
 
 #example: awk -F= '/t=/ {printf "%.03f\n", $2/1000}' /sys/devices/w1_bus_master1/28-000123456789/w1_slave
